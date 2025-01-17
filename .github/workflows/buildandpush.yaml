@@ -1,6 +1,9 @@
 name: Create and publish
 
 on:
+  push:
+    branches:
+      - timblaktu
   workflow_dispatch:
     inputs:
       version:
