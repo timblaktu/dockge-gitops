@@ -2,11 +2,11 @@ package git
 
 const (
 	repoUpToDateMsg         = "Repo is up to date"
-	repoNotExistsCloningMsg = "Repo does not exist, cloning..."
+	repoNotExistsCloningMsg = "Repo does not exist at targetDirPath=%s, cloning there...\n"
 	repoClonedMsg           = "Repo cloned"
-	repoNotUpToDateMsg      = "Remote %s has new commits, pulling into %s..."
+	repoNotUpToDateMsg      = "Remote %s has new commits, pulling into %s...\n"
 	repoPulledMsg           = "Repo pulled"
-	copyingFilesMsg         = "Copying files from %s to %s..."
+	copyingFilesMsg         = "Copying files from %s to %s...\n"
 	filesCopiedMsg          = "Files copied"
 
 	urlParseErr                     = "error parsing url: %w"

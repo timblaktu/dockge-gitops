@@ -57,6 +57,7 @@ func ClearRepoFolder(dirPath string) error {
 }
 
 func cloneRepo(repoUrl, targetDirPath, sourceDirPath string) error {
+    // TODO: git.PlainClone returns ErrRepositoryAlreadyExists, use that
 	files, err := os.ReadDir(targetDirPath)
 	if err != nil {
 		return fmt.Errorf(readingDirErr, err)
@@ -66,8 +67,8 @@ func cloneRepo(repoUrl, targetDirPath, sourceDirPath string) error {
 		return fmt.Errorf(targetDirNotEmptyErr)
 	}
 
-	fmt.Println(repoNotExistsCloningMsg)
-	if _, err := git.PlainClone(targetDirPath, false, &git.CloneOptions{
+	fmt.Printf(repoNotExistsCloningMsg, targetDirPath)
+    if _, err := git.PlainClone(targetDirPath, false, &git.CloneOptions{
 		URL: repoUrl,
 	}); err != nil {
 		return fmt.Errorf(cloningRepoErr, err)
