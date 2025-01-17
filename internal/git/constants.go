@@ -4,7 +4,7 @@ const (
 	repoUpToDateMsg         = "Repo is up to date"
 	repoNotExistsCloningMsg = "Repo does not exist, cloning..."
 	repoClonedMsg           = "Repo cloned"
-	repoNotUpToDateMsg      = "Repo is not up to date, pulling..."
+	repoNotUpToDateMsg      = "Remote %s has new commits, pulling into %s..."
 	repoPulledMsg           = "Repo pulled"
 	copyingFilesMsg         = "Copying files from %s to %s..."
 	filesCopiedMsg          = "Files copied"

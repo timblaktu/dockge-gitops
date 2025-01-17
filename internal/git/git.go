@@ -37,6 +37,7 @@ func CloneOrPullRepo(repoUrl, pat, dirPath, stackPath string) error {
 		return nil
 	}
 
+	fmt.Println(repoNotUpToDateMsg, repoUrl, dirPath)
 	return pullRepo(dirPath, stackPath)
 }
 
@@ -81,7 +82,6 @@ func cloneRepo(repoUrl, targetDirPath, sourceDirPath string) error {
 }
 
 func pullRepo(dirPath, stackPath string) error {
-	fmt.Println(repoNotUpToDateMsg)
 	repo, err := git.PlainOpen(dirPath)
 	if err != nil {
 		return fmt.Errorf(openingRepoErr, err)
