@@ -1,5 +1,5 @@
 build:
-		@cd cmd && go guild -o ../bin/dockge-gitops
+		@cd cmd && go build -o ../bin/dockge-gitops
 
 test:
 		@go test ./...

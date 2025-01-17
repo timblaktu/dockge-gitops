@@ -26,3 +26,5 @@ go.work
 # docker-compose for local development
 /docker/compose.yml
 .DS_Store
+
+*.vim

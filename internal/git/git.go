@@ -164,7 +164,7 @@ func remoteHasUpdate(dirpath string) (bool, error) {
 }
 
 func copyFilesToDir(dirPath, newDirPath string) error {
-	fmt.Println(copyingFilesMsg)
+	fmt.Println(copyingFilesMsg, dirPath, newDirPath)
 	clearDestination(newDirPath)
 
 	items, err := os.ReadDir(dirPath)
