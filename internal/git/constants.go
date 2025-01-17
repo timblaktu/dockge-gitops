@@ -6,7 +6,7 @@ const (
 	repoClonedMsg           = "Repo cloned"
 	repoNotUpToDateMsg      = "Repo is not up to date, pulling..."
 	repoPulledMsg           = "Repo pulled"
-	copyingFilesMsg         = "Copying files..."
+	copyingFilesMsg         = "Copying files (but, from where to where???)..."
 	filesCopiedMsg          = "Files copied"
 
 	urlParseErr                     = "error parsing url: %w"
