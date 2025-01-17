@@ -37,7 +37,7 @@ func CloneOrPullRepo(repoUrl, pat, dirPath, stackPath string) error {
 		return nil
 	}
 
-	fmt.Println(repoNotUpToDateMsg, repoUrl, dirPath)
+	fmt.Printf(repoNotUpToDateMsg, repoUrl, dirPath)
 	return pullRepo(dirPath, stackPath)
 }
 
@@ -98,7 +98,7 @@ func pullRepo(dirPath, stackPath string) error {
 	}
 
 	if err == git.NoErrAlreadyUpToDate {
-		fmt.Println(fmt.Println(repoUpToDateMsg))
+		fmt.Println(repoUpToDateMsg)
 	} else {
 		fmt.Println(repoPulledMsg)
 	}
@@ -164,7 +164,7 @@ func remoteHasUpdate(dirpath string) (bool, error) {
 }
 
 func copyFilesToDir(dirPath, newDirPath string) error {
-	fmt.Println(copyingFilesMsg, dirPath, newDirPath)
+	fmt.Printf(copyingFilesMsg, dirPath, newDirPath)
 	clearDestination(newDirPath)
 
 	items, err := os.ReadDir(dirPath)
