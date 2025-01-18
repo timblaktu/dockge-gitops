@@ -42,7 +42,7 @@ func updateRepo(repoUrl, pat, stackPath string) error {
             }
             if err := r.Fetch(&git.FetchOptions{
                 Progress: os.Stdout,
-            }); err != nil {
+            }); err != nil && err != git.NoErrAlreadyUpToDate {
                 return fmt.Errorf(fetchingRepoErr, err)
             }
             fmt.Printf("git reset --hard HEAD\n")
