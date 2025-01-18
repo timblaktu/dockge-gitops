@@ -17,6 +17,7 @@ const (
 	getRemoteErr                    = "error getting remote commit hash: %w"
 	checkingIfRepoHasUpdateErr      = "error checking if repo has update: %w"
 	checkingIfRepoExistsErr         = "error checking if repo exists: %w"
+	openRepoErr                     = "error opening repo: r=%w err=%w"
 	cloningRepoErr                  = "error cloning repo: %w"
 	mergingRepoErr                  = "error merging repo: %w"
 	fetchingRepoErr                 = "error fetching repo: %w"

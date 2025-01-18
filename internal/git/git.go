@@ -36,6 +36,10 @@ func updateRepo(repoUrl, pat, stackPath string) error {
     if err != nil {
         if errors.Is(err, git.ErrRepositoryAlreadyExists) {
             fmt.Printf("Repo already exists. Fetching..\n")
+            r, err = git.PlainOpen(stackPath)
+            if err != nil || r == nil {
+                return fmt.Errorf(openRepoErr, r, err)
+            }
             if err := r.Fetch(&git.FetchOptions{
                 Progress: os.Stdout,
             }); err != nil {
