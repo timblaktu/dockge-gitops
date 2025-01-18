@@ -15,23 +15,18 @@ const (
 )
 
 func Run(cfg *config.Config) {
-	pollingRateDuration, err := polling.ParsePollingRate(cfg.PollingRate)
+    pollingRateDuration, err := polling.ParsePollingRate(cfg.PollingRate)
 	handleError(err)
-
-	if err := os.MkdirAll(repoDir, 0755); err != nil {
-		handleError(err)
-	}
 
 	ticker := time.NewTicker(pollingRateDuration)
 	defer ticker.Stop()
 
-	gitErr := git.CloneOrPullRepo(cfg.RepoUrl, cfg.Pat, repoDir, cfg.DockgeStacksDir)
-	handleError(gitErr)
-
-	for range ticker.C {
-		gitErr := git.CloneOrPullRepo(cfg.RepoUrl, cfg.Pat, repoDir, cfg.DockgeStacksDir)
-		handleError(gitErr)
-	}
+    gitErr := git.HandleRepo(cfg.RepoUrl, cfg.Pat, repoDir, cfg.DockgeStacksDir, cfg.NoLocalChanges)
+    handleError(gitErr)
+    for range ticker.C {
+        gitErr := git.HandleRepo(cfg.RepoUrl, cfg.Pat, repoDir, cfg.DockgeStacksDir, cfg.NoLocalChanges)
+        handleError(gitErr)
+    }
 }
 
 func handleError(err error) {

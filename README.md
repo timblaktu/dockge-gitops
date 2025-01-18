@@ -19,6 +19,7 @@ Switching from [Portainer](https://www.portainer.io/) to [Dockge](https://github
 | PAT | Personal Access Token for private repos | | No |
 | POLLING_RATE | How often to poll for changes | 5m | No |
 | DOCKGE_STACKS_DIR | Path to Dockge stacks directory | /opt/stacks | No |
+| NO_LOCAL_CHANGES | Whether to overwrite stacks dir with each fetch from remote HEAD | "True" | No |
 
 ### Volumes
 | Host Example | Container | Description |

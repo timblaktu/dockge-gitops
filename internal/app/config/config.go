@@ -1,12 +1,17 @@
 package config
 
-import "github.com/ebaldebo/dockge-gitops/internal/env"
+import (
+    "strconv"
+
+    "github.com/ebaldebo/dockge-gitops/internal/env"
+)
 
 type Config struct {
 	RepoUrl         string
 	Pat             string
 	PollingRate     string
 	DockgeStacksDir string
+    NoLocalChanges	bool
 }
 
 const (
@@ -14,6 +19,7 @@ const (
 	patEnv             = "PAT"
 	pollingRateEnv     = "POLLING_RATE"
 	dockgeStacksDirEnv = "DOCKGE_STACKS_DIR"
+    noLocalChangesEnv  = "NO_LOCAL_CHANGES"
 )
 
 func New() (*Config, error) {
@@ -37,10 +43,20 @@ func New() (*Config, error) {
 		return nil, err
 	}
 
+	noLocalChangesString, err := env.GetEnvVar(false, noLocalChangesEnv, "true")
+	if err != nil {
+		return nil, err
+	}
+	noLocalChanges, err := strconv.ParseBool(noLocalChangesString);
+    if err != nil {
+        return nil, err
+    }
+
 	return &Config{
 		RepoUrl:         repoUrl,
 		Pat:             pat,
 		PollingRate:     pollingRate,
 		DockgeStacksDir: dockgeStacksDir,
+        NoLocalChanges:  noLocalChanges,
 	}, err
 }

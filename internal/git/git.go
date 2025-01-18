@@ -1,7 +1,8 @@
 package git
 
 import (
-	"fmt"
+	"errors"
+    "fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -12,32 +13,96 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
+func HandleRepo(repoUrl, pat, dirPath, stackPath string, noLocalChanges bool) error {
+    if noLocalChanges {
+        return updateRepo(repoUrl, pat, stackPath) 
+    } else {
+        return CloneOrPullRepo(repoUrl, pat, dirPath, stackPath)
+    }
+}
+
+func updateRepo(repoUrl, pat, stackPath string) error {
+	var r *git.Repository = nil;
+	var err error;
+    if _, err := buildUrl(repoUrl, pat); err != nil {
+		return fmt.Errorf(buildingUrlErr, err)
+	}
+    r, err = git.PlainClone(stackPath, false, &git.CloneOptions{
+		URL: repoUrl,
+        Progress: os.Stdout,
+    });
+    if err != nil {
+        if errors.Is(err, git.ErrRepositoryAlreadyExists) {
+            fmt.Printf("Repo already exists. Fetching..\n")
+            if err := r.Fetch(&git.FetchOptions{
+                Progress: os.Stdout,
+            }); err != nil {
+                return fmt.Errorf(fetchingRepoErr, err)
+            }
+            fmt.Printf("git reset --hard HEAD\n")
+            head, err := r.Head();
+            if err != nil {
+                return fmt.Errorf(gettingHeadRepoErr, err)
+            }
+            w, err := r.Worktree();
+            if err != nil {
+                return fmt.Errorf(workTreeErr, err)
+            }
+            if err := w.Reset(&git.ResetOptions{
+                Commit: head.Hash(),
+                Mode: git.HardReset,
+            }); err != nil {
+                return fmt.Errorf(resettingRepoErr, err)
+            }
+            fmt.Printf("git merge origin/$CURRENT_BRANCH  # or git merge '@{u}' shortcut\n")
+            // ref := plumbing.NewHashReference("@{u}", head.Hash())
+            // TODO: fix error: r.Merge undefined (type *"github.com/go-git/go-git/v5".Repository has no field or method Merge)
+            //err = r.Merge(*head, git.MergeOptions{
+            //    Strategy: git.FastForwardMerge,
+            //}); 
+            //if err != nil {
+            //    return fmt.Errorf(mergingRepoErr, err)
+            //}
+            return nil
+
+        } else {
+            return fmt.Errorf(cloningRepoErr, err)
+        }
+    } 
+    fmt.Println(repoClonedMsg)
+    return nil
+}
+
 func CloneOrPullRepo(repoUrl, pat, dirPath, stackPath string) error {
+    if err := os.MkdirAll(dirPath, 0755); err != nil {
+        fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+    }
 	url, err := buildUrl(repoUrl, pat)
 	if err != nil {
 		return fmt.Errorf(buildingUrlErr, err)
 	}
 
-	gitPath := filepath.Join(dirPath, ".git")
-	if _, err := os.Stat(gitPath); os.IsNotExist(err) {
-		return cloneRepo(url, dirPath, stackPath)
-	}
+    gitPath := filepath.Join(dirPath, ".git")
+    if _, err := os.Stat(gitPath); os.IsNotExist(err) {
+        return cloneRepo(url, dirPath, stackPath)
+    }
 
-	if err != nil {
-		return fmt.Errorf(checkingIfRepoExistsErr, err)
-	}
+    if err != nil {
+        return fmt.Errorf(checkingIfRepoExistsErr, err)
+    }
 
-	shouldPull, err := remoteHasUpdate(dirPath)
-	if err != nil {
-		return fmt.Errorf(checkingIfRepoHasUpdateErr, err)
-	}
+    shouldPull, err := remoteHasUpdate(dirPath)
+    if err != nil {
+        return fmt.Errorf(checkingIfRepoHasUpdateErr, err)
+    }
 
-	if !shouldPull {
-		fmt.Println(repoUpToDateMsg)
-		return nil
-	}
+    if !shouldPull {
+        fmt.Println(repoUpToDateMsg)
+        return nil
+    }
 
-	fmt.Printf(repoNotUpToDateMsg, repoUrl, dirPath)
+    fmt.Printf(repoNotUpToDateMsg, repoUrl, dirPath)
 	return pullRepo(dirPath, stackPath)
 }
 
@@ -57,7 +122,6 @@ func ClearRepoFolder(dirPath string) error {
 }
 
 func cloneRepo(repoUrl, targetDirPath, sourceDirPath string) error {
-    // TODO: git.PlainClone returns ErrRepositoryAlreadyExists, use that
 	files, err := os.ReadDir(targetDirPath)
 	if err != nil {
 		return fmt.Errorf(readingDirErr, err)
@@ -67,10 +131,17 @@ func cloneRepo(repoUrl, targetDirPath, sourceDirPath string) error {
 		return fmt.Errorf(targetDirNotEmptyErr)
 	}
 
-	fmt.Printf(repoNotExistsCloningMsg, targetDirPath)
+	// We have asserted that there is no repo in targetDirPath.
+    fmt.Printf(repoNotExistsCloningMsg, targetDirPath)
+    
+
+    // TODO: git.PlainClone returns ErrRepositoryAlreadyExists, 
+    //       use that instead of files check above?
+    
     if _, err := git.PlainClone(targetDirPath, false, &git.CloneOptions{
 		URL: repoUrl,
-	}); err != nil {
+        Progress: os.Stdout,
+    }); err != nil {
 		return fmt.Errorf(cloningRepoErr, err)
 	}
 	fmt.Println(repoClonedMsg)
@@ -214,9 +285,11 @@ func clearDestination(newDirPath string) error {
 		return fmt.Errorf(gettingFilesFromDestinationErr, err)
 	}
 
+	fmt.Printf(clearDestinationMsg, newDirPath)
 	for _, dir := range dirs {
 		dgoFilePath := filepath.Join(dir, dgoFileName)
 		if _, err := os.Stat(dgoFilePath); err == nil {
+            fmt.Printf(clearDirMsg, dir)
 			err := os.RemoveAll(dir)
 			if err != nil {
 				return fmt.Errorf(removingFilesFromDestinationErr, err)
