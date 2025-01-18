@@ -24,11 +24,13 @@ func HandleRepo(repoUrl, pat, dirPath, stackPath string, noLocalChanges bool) er
 func updateRepo(repoUrl, pat, stackPath string) error {
 	var r *git.Repository = nil;
 	var err error;
-    if _, err := buildUrl(repoUrl, pat); err != nil {
+    urlWithAuth, err := buildUrl(repoUrl, pat)
+    if err != nil {
 		return fmt.Errorf(buildingUrlErr, err)
 	}
+    fmt.Printf("Attempting clone of %s into %s..\n", repoUrl, stackPath)
     r, err = git.PlainClone(stackPath, false, &git.CloneOptions{
-		URL: repoUrl,
+		URL: urlWithAuth,
         Progress: os.Stdout,
     });
     if err != nil {
