@@ -55,14 +55,12 @@ func updateRepo(repoUrl, pat, stackPath string) error {
                 return fmt.Errorf(resettingRepoErr, err)
             }
             fmt.Printf("git merge origin/$CURRENT_BRANCH  # or git merge '@{u}' shortcut\n")
-            // ref := plumbing.NewHashReference("@{u}", head.Hash())
-            // TODO: fix error: r.Merge undefined (type *"github.com/go-git/go-git/v5".Repository has no field or method Merge)
-            //err = r.Merge(*head, git.MergeOptions{
-            //    Strategy: git.FastForwardMerge,
-            //}); 
-            //if err != nil {
-            //    return fmt.Errorf(mergingRepoErr, err)
-            //}
+            err = r.Merge(*head, git.MergeOptions{
+                Strategy: git.FastForwardMerge,
+            }); 
+            if err != nil {
+                return fmt.Errorf(mergingRepoErr, err)
+            }
             return nil
 
         } else {
