@@ -2,7 +2,8 @@ package app
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
+    "os"
 	"time"
 
 	"github.com/ebaldebo/dockge-gitops/internal/app/config"
@@ -15,6 +16,12 @@ const (
 )
 
 func Run(cfg *config.Config) {
+    files, err := ioutil.ReadDir(cfg.DockgeStacksDir)
+	handleError(err)
+    for _, file := range files {
+        fmt.Println(file.Name(), file.IsDir())
+    }
+
     pollingRateDuration, err := polling.ParsePollingRate(cfg.PollingRate)
 	handleError(err)
 

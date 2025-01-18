@@ -31,7 +31,6 @@ func updateRepo(repoUrl, pat, stackPath string) error {
     fmt.Printf("Attempting clone of %s into %s..\n", repoUrl, stackPath)
     r, err = git.PlainClone(stackPath, false, &git.CloneOptions{
 		URL: urlWithAuth,
-        Progress: os.Stdout,
     });
     if err != nil {
         if errors.Is(err, git.ErrRepositoryAlreadyExists) {
@@ -41,7 +40,6 @@ func updateRepo(repoUrl, pat, stackPath string) error {
                 return fmt.Errorf(openRepoErr, r, err)
             }
             if err := r.Fetch(&git.FetchOptions{
-                Progress: os.Stdout,
             }); err != nil && err != git.NoErrAlreadyUpToDate {
                 return fmt.Errorf(fetchingRepoErr, err)
             }
@@ -60,7 +58,7 @@ func updateRepo(repoUrl, pat, stackPath string) error {
             }); err != nil {
                 return fmt.Errorf(resettingRepoErr, err)
             }
-            fmt.Printf("git merge origin/$CURRENT_BRANCH  # or git merge '@{u}' shortcut\n")
+            fmt.Printf("git merge '@{u}'\n")
             err = r.Merge(*head, git.MergeOptions{
                 Strategy: git.FastForwardMerge,
             }); 
@@ -138,13 +136,8 @@ func cloneRepo(repoUrl, targetDirPath, sourceDirPath string) error {
 	// We have asserted that there is no repo in targetDirPath.
     fmt.Printf(repoNotExistsCloningMsg, targetDirPath)
     
-
-    // TODO: git.PlainClone returns ErrRepositoryAlreadyExists, 
-    //       use that instead of files check above?
-    
     if _, err := git.PlainClone(targetDirPath, false, &git.CloneOptions{
 		URL: repoUrl,
-        Progress: os.Stdout,
     }); err != nil {
 		return fmt.Errorf(cloningRepoErr, err)
 	}
